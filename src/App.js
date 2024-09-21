@@ -1,23 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import Header from "./components/header/Header";
+import HomePage from "./components/homepage/Homepage";
+import PopularMovPage from "./components/homepage/moviesCategory/popularMovies/PopularMovPage";
+import TopRatedMoviesPage from "./components/homepage/moviesCategory/topRatedMovies/TopRatedMoviesPage";
+import Main from "./components/main/Main";
+import './index.css';
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          
+          <Route path="/" element={
+            <>
+              <Header />
+              <Main />
+            </>
+          } />
+
+          <Route path="homepage" element={
+            <>
+              <HomePage />
+            </>
+          } />
+
+          <Route path="popularfilms/:id" element={<PopularMovPage />} />
+          <Route path="topratedfilms/:id" element={<TopRatedMoviesPage />} />
+
+
+        </Routes>
+      </Router>
     </div>
   );
 }

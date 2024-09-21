@@ -1,0 +1,44 @@
+.homepage {
+    display: flex;
+}
+
+.leftPiece {
+
+    div {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    background-color: #2b2c2c;
+    width: 20%;
+    padding: 25px 35px;
+
+    a:first-of-type {
+        background-color: #5664f5;
+    }
+
+    a {
+        background-color: #030303;
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+}
+
+.navs {
+    position: sticky;
+    top: 120px;
+    z-index: 1;
+}
+
+.rightPiece {
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
+    background-color: #1a1a1a;
+    width: 80%;
+    position: relative;
+    padding: 15px;
+
+}

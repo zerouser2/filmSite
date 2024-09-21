@@ -1,0 +1,93 @@
+.popularMovies {
+
+    .title {
+        font-weight: 700;
+        font-size: 28px;
+
+        cursor: pointer;
+    }
+}
+
+
+.scrollButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+
+.movieContainer {
+    display: flex;
+    overflow-x: scroll;
+    gap: 25px;
+    padding: 15px 0;
+
+    &::-webkit-scrollbar {
+        height: 5px;
+        /* Высота горизонтального скроллбара */
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: #2b2b2b;
+        /* Цвет фона скроллбара */
+        border-radius: 10px;
+        /* Закругление */
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: #888;
+        /* Цвет ползунка */
+        border-radius: 50px;
+        /* Закругление */
+        border: 2px solid #2b2b2b;
+        /* Отступы внутри ползунка */
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+        background-color: #555;
+    }
+}
+
+
+.lookAll {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    span {
+        user-select: none;
+        cursor: pointer;
+    }
+
+    p {
+        cursor: pointer;
+
+    }
+}
+
+
+.movieWrapper {
+    display: flex;
+    overflow-y: hidden;
+    padding: 15px 0;
+
+}
+
+
+.movie {
+    display: flex;
+    flex-direction: column;
+    transition: all 0.2s ease-in;
+
+    img {
+        width: 200px;
+        border-radius: 15px;
+    }
+}
+
+.movie:hover {
+    transform: scale(1.1);
+}
