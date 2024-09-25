@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
+// Основной обработчик для получения детализированной информации о фильмах
 const fetchMovieDetails = async (movies) => {
     try {
-        // Параллельные запросы для различных данных
         const [moviesWithTrailers, moviesWithCredits, moviesWithKeywords, moviesLittleInfo] = await Promise.all([
             fetchMovieTrailers(movies),
             fetchMovieCredits(movies),
@@ -10,112 +10,142 @@ const fetchMovieDetails = async (movies) => {
             fetchMovieLittleInfo(movies),
         ]);
 
-        // Объединение всех данных
         return moviesWithTrailers.map((movie, index) => ({
             ...movie,
-            credits: moviesWithCredits[index].creditData,
-            keywords: moviesWithKeywords[index].keywordData,
-            littleInfo: moviesLittleInfo[index].movieData
+            credits: moviesWithCredits[index]?.creditData || [],
+            keywords: moviesWithKeywords[index]?.keywordData || [],
+            littleInfo: moviesLittleInfo[index]?.movieData || {}
         }));
+
     } catch (error) {
         console.error("Failed to fetch movie details:", error);
-        return movies; // Возвращаем базовые данные при ошибке
+        return movies; // Вернем базовые данные при ошибке
     }
 };
 
+// Получение популярных фильмов
 export const fetchPopularMovies = createAsyncThunk(
     'movies/fetchPopularMovies',
     async () => {
-        const response = await fetch('https://api.themoviedb.org/3/movie/popular?api_key=32e298a0ed54b91c64093a45759e40aa');
-        const data = await response.json();
-        return await fetchMovieDetails(data.results);
+        try {
+            const response = await fetch('https://api.themoviedb.org/3/movie/popular?api_key=32e298a0ed54b91c64093a45759e40aa');
+            const data = await response.json();
+            return await fetchMovieDetails(data.results);
+        } catch (error) {
+            console.error('Failed to fetch popular movies:', error);
+            return []; // Возвращаем пустой массив при ошибке
+        }
     }
 );
 
-// Создание асинхронного thunk для топ-рейтинг фильмов
+// Получение фильмов с высоким рейтингом
 export const fetchTopRatedMovies = createAsyncThunk(
     'movies/fetchTopRatedMovies',
     async () => {
-        const response = await fetch('https://api.themoviedb.org/3/movie/top_rated?api_key=32e298a0ed54b91c64093a45759e40aa');
-        const data = await response.json();
-        return await fetchMovieDetails(data.results);
+        try {
+            const response = await fetch('https://api.themoviedb.org/3/movie/top_rated?api_key=32e298a0ed54b91c64093a45759e40aa');
+            const data = await response.json();
+            return await fetchMovieDetails(data.results);
+        } catch (error) {
+            console.error('Failed to fetch top rated movies:', error);
+            return [];
+        }
     }
 );
 
+// Получение предстоящих фильмов
 export const fetchUpcoming = createAsyncThunk(
     'movies/fetchUpcoming',
     async () => {
-        const response = await fetch('https://api.themoviedb.org/3/movie/upcoming?api_key=32e298a0ed54b91c64093a45759e40aa');
-        const data = await response.json();
-        return await fetchMovieDetails(data.results);
+        try {
+            const response = await fetch('https://api.themoviedb.org/3/movie/upcoming?api_key=32e298a0ed54b91c64093a45759e40aa');
+            const data = await response.json();
+            return await fetchMovieDetails(data.results);
+        } catch (error) {
+            console.error('Failed to fetch upcoming movies:', error);
+            return [];
+        }
     }
 );
 
+export const fetchActors = createAsyncThunk(
+    'movies/fetchActors',
+    async (page=1) => {
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/person/popular?api_key=32e298a0ed54b91c64093a45759e40aa&page=${page}`);
+            const data = await response.json();
+            return data.results
+        } catch (error) {
+            console.error('Failed to fetch upcoming movies:', error);
+            return [];
+        }
+    }
+);
 
-// Функция получения дополнительной информации о фильмах
 const fetchMovieLittleInfo = async (movies) => {
-    const moviesWithLittleInfo = await Promise.all(movies.map(async (movie) => {
-        const movieResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=32e298a0ed54b91c64093a45759e40aa`);
-        const movieData = await movieResponse.json();
-
-        return {
-            ...movie,
-            movieData
-        };
-    }));
-    return moviesWithLittleInfo;
+    try {
+        return await Promise.all(movies.map(async (movie) => {
+            const movieResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}?api_key=32e298a0ed54b91c64093a45759e40aa`);
+            const movieData = await movieResponse.json();
+            return { ...movie, movieData };
+        }));
+    } catch (error) {
+        console.error('Failed to fetch little info:', error);
+        return movies;
+    }
 };
 
-// Функция получения ключевых слов для фильмов
+// Получение ключевых слов для фильмов
 const fetchMovieKeywords = async (movies) => {
-    const moviesWithKeywords = await Promise.all(movies.map(async (movie) => {
-        const keywordsResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/keywords?api_key=32e298a0ed54b91c64093a45759e40aa`);
-        const keywordData = await keywordsResponse.json();
-
-        return {
-            ...movie,
-            keywordData
-        };
-    }));
-    return moviesWithKeywords;
+    try {
+        return await Promise.all(movies.map(async (movie) => {
+            const keywordsResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/keywords?api_key=32e298a0ed54b91c64093a45759e40aa`);
+            const keywordData = await keywordsResponse.json();
+            return { ...movie, keywordData };
+        }));
+    } catch (error) {
+        console.error('Failed to fetch movie keywords:', error);
+        return movies;
+    }
 };
 
-// Функция получения кредитов для фильмов
+// Получение информации о кредитах
 const fetchMovieCredits = async (movies) => {
-    const moviesWithCredits = await Promise.all(movies.map(async (movie) => {
-        const creditResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=32e298a0ed54b91c64093a45759e40aa`);
-        const creditData = await creditResponse.json();
-
-        return {
-            ...movie,
-            creditData
-        };
-    }));
-    return moviesWithCredits;
+    try {
+        return await Promise.all(movies.map(async (movie) => {
+            const creditResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/credits?api_key=32e298a0ed54b91c64093a45759e40aa`);
+            const creditData = await creditResponse.json();
+            return { ...movie, creditData };
+        }));
+    } catch (error) {
+        console.error('Failed to fetch movie credits:', error);
+        return movies;
+    }
 };
 
-// Функция получения трейлеров для фильмов
+// Получение трейлеров для фильмов
 const fetchMovieTrailers = async (movies) => {
-    const moviesWithTrailers = await Promise.all(movies.map(async (movie) => {
-        const trailerResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=32e298a0ed54b91c64093a45759e40aa`);
-        const trailerData = await trailerResponse.json();
-        const trailer = trailerData.results.find(video => video.type === "Trailer");
-
-        return {
-            ...movie,
-            trailerKey: trailer ? trailer.key : null
-        };
-    }));
-    return moviesWithTrailers;
+    try {
+        return await Promise.all(movies.map(async (movie) => {
+            const trailerResponse = await fetch(`https://api.themoviedb.org/3/movie/${movie.id}/videos?api_key=32e298a0ed54b91c64093a45759e40aa`);
+            const trailerData = await trailerResponse.json();
+            const trailer = trailerData.results.find(video => video.type === "Trailer");
+            return { ...movie, trailerKey: trailer ? trailer.key : null };
+        }));
+    } catch (error) {
+        console.error('Failed to fetch movie trailers:', error);
+        return movies;
+    }
 };
-
 
 const Movies = createSlice({
     name: 'movies',
     initialState: {
+        allMovies: [],
         popularMovies: [],
         topRatedMovies: [],
-        upComingMovies: []
+        upComingMovies: [],
+        actors: []
     },
     reducers: {
         addPopularMovies(state, action) {
@@ -129,6 +159,10 @@ const Movies = createSlice({
         addUpComingMovies(state, action) {
             state.upComingMovies = action.payload
             console.log(action.payload)
+        },
+        addActors(state, action) {
+            state.actors = action.payload
+            console.log(action.payload)
         }
     },
     extraReducers: (builder) => {
@@ -141,6 +175,9 @@ const Movies = createSlice({
             })
             .addCase(fetchUpcoming.fulfilled, (state, action) => {
                 state.upComingMovies = action.payload;
+            })
+            .addCase(fetchActors.fulfilled, (state, action) => {
+                state.actors = [...state.actors, ...action.payload]
             })
     }
 })

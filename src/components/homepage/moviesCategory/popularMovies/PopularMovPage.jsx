@@ -34,7 +34,6 @@ function PopularMovPage() {
         if (popularMovies.length === 0) {
             dispatch(fetchPopularMovies())
         }
-
     }, [dispatch, popularMovies.length])
 
     useEffect(() => {

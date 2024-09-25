@@ -1,0 +1,99 @@
+.actorsBlock {
+    background-color: #1a1a1a;
+    padding: 15px 35px;
+
+    .title {
+        font-weight: 700;
+        font-size: 32px;
+        margin-bottom: 10px;
+    }
+}
+
+
+.actors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    white-space: nowrap;
+}
+
+/* Стили для блоков */
+.actor {
+    flex: 1 1 250px;
+    min-width: 50px;
+    max-width: 300px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    cursor: pointer;
+
+    img {
+        max-width: 230px;
+        width: 100%;
+        object-fit: cover;
+        border-radius: 4px;
+        margin-bottom: 8px;
+    }
+
+    p {
+        font-weight: 700;
+        font-size: clamp(1.5rem, 3hw, 2.25rem);
+    }
+}
+
+
+.actorBlock {
+    padding: 15px 45px;
+    background-color: #1a1a1a;
+}
+
+
+.actorPhoto {
+    display: flex;
+
+    img {
+        width: 350px;
+        border-radius: 15px;
+    }
+}
+
+.knownformovie {
+
+    img {
+        width: 100%;
+        max-width: 150px;
+    }
+}
+
+.rightBlock {
+    display: flex;
+}
+
+
+@media (max-width: 1200px) {
+    .actor {
+        flex: 1 1 250px;
+        /* Блоки уменьшаются до 180px */
+    }
+}
+
+@media (max-width: 992px) {
+    .actor {
+        flex: 1 1 200px;
+        /* Блоки уменьшаются до 150px */
+    }
+}
+
+@media (max-width: 768px) {
+    .actor {
+        flex: 1 1 120px;
+        /* Блоки уменьшаются до 120px */
+        height: 250px;
+        /* Высота блоков уменьшается */
+    }
+}

@@ -9,7 +9,6 @@
     z-index: 2;
     background-color: #121212;
 
-
     div:nth-of-type(1) {
         display: flex;
         align-items: center;
@@ -18,6 +17,15 @@
 
         p {
             cursor: pointer;
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: 600;
+            font-size: 18px
         }
     }
 

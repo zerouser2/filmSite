@@ -1,12 +1,14 @@
+import { Link } from 'react-router-dom';
 import styles from './header.module.scss'
 
 function Header() {
     return (
         <div className={styles.header}>
             <div>
-                <p>Movie Buff</p>
-                <p>Home</p>
-                <p>Genres</p>
+                <h1>Movie Buff</h1>
+
+                <Link to='/homepage'>Home</Link>
+                <Link to='/actors'>Actors</Link>
                 <p>Top movies</p>
                 <p>Upcoming</p>
 
