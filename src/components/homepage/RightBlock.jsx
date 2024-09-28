@@ -19,7 +19,7 @@ function RightBlock() {
       if (topRatedMovies.length === 0) {
         dispatch(fetchTopRatedMovies());
       }
-      if(upComingMovies.length === 0) {
+      if (upComingMovies.length === 0) {
         dispatch(fetchUpcoming())
       }
     }, [dispatch, popularMovies.length, topRatedMovies.length, upComingMovies.length]);

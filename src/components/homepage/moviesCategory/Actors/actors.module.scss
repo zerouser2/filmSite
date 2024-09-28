@@ -13,16 +13,14 @@
 .actors {
     display: flex;
     flex-wrap: wrap;
-    gap: 15px;
+    gap: 25px;
     white-space: nowrap;
 }
 
 /* Стили для блоков */
 .actor {
-    flex: 1 1 250px;
-    min-width: 50px;
-    max-width: 300px;
-    height: 400px;
+    flex: 1 2 250px;
+    min-width: 250px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -33,16 +31,18 @@
     cursor: pointer;
 
     img {
-        max-width: 230px;
+        height: 100%;
         width: 100%;
         object-fit: cover;
         border-radius: 4px;
-        margin-bottom: 8px;
-    }
 
-    p {
+    }
+    
+    a {
+        text-decoration: none;
+        color: #fff;
         font-weight: 700;
-        font-size: clamp(1.5rem, 3hw, 2.25rem);
+        font-size: clamp(1.25rem, 1.75vw, 2.25rem);
     }
 }
 
@@ -50,12 +50,9 @@
 .actorBlock {
     padding: 15px 45px;
     background-color: #1a1a1a;
-}
-
-
-.actorPhoto {
     display: flex;
-
+    gap: 35px;
+    
     img {
         width: 350px;
         border-radius: 15px;
@@ -72,8 +69,99 @@
 
 .rightBlock {
     display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
+.known_for {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .title {
+        font-weight: 700;
+        font-size: 32px;
+    }
+}
+
+.info {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 10px;
+    justify-content: start;
+    width: 90%;
+
+    p:nth-of-type(1) {
+        font-weight: 700;
+        font-size: 38px;
+    }
+
+    p:nth-of-type(2) {
+        font-weight: 500;
+        font-size: 28px;
+    }
+
+    p:nth-of-type(3) {
+        font-weight: 400;
+        font-size: 18px;
+    }
+}
+
+.mvs {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.personalInfo {
+    font-weight: 700 !important;
+    font-size: 36px !important;
+}
+
+.leftBlock {
+
+    span {
+        font-weight: 700;
+        font-size: 24px;
+    }
+
+    p {
+        font-weight: 500;
+        font-size: 18px;
+        margin-bottom: 10px;
+    }
+}
+
+.actingArt {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+
+    .title {
+        font-weight: 700;
+        font-size: 32px;
+    }
+}
+
+.filmCred {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.everyMovie {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    border: 1px solid #555;
+    padding: 15px;
+    width: 80%;
+
+    img {
+        width: 100px;
+    }
+}
 
 @media (max-width: 1200px) {
     .actor {
@@ -92,8 +180,6 @@
 @media (max-width: 768px) {
     .actor {
         flex: 1 1 120px;
-        /* Блоки уменьшаются до 120px */
-        height: 250px;
-        /* Высота блоков уменьшается */
+        height: 100%;
     }
 }

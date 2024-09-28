@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { act } from "react";
 
 // Основной обработчик для получения детализированной информации о фильмах
 const fetchMovieDetails = async (movies) => {
@@ -70,11 +71,40 @@ export const fetchUpcoming = createAsyncThunk(
 
 export const fetchActors = createAsyncThunk(
     'movies/fetchActors',
-    async (page=1) => {
+    async (page = 1) => {
         try {
             const response = await fetch(`https://api.themoviedb.org/3/person/popular?api_key=32e298a0ed54b91c64093a45759e40aa&page=${page}`);
             const data = await response.json();
             return data.results
+        } catch (error) {
+            console.error('Failed to fetch upcoming movies:', error);
+            return [];
+        }
+    }
+);
+
+
+export const fetchActorDetail = createAsyncThunk(
+    'movies/fetchActorDetail',
+    async (id) => {
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/person/${id}?api_key=32e298a0ed54b91c64093a45759e40aa`);
+            const data = await response.json();
+            return data
+        } catch (error) {
+            console.error('Failed to fetch upcoming movies:', error);
+            return [];
+        }
+    }
+);
+
+export const fetchActorCredits = createAsyncThunk(
+    'movies/fetchActorCredits',
+    async (id) => {
+        try {
+            const response = await fetch(`https://api.themoviedb.org/3/person/${id}/movie_credits?api_key=32e298a0ed54b91c64093a45759e40aa`);
+            const data = await response.json();
+            return data.cast
         } catch (error) {
             console.error('Failed to fetch upcoming movies:', error);
             return [];
@@ -145,7 +175,9 @@ const Movies = createSlice({
         popularMovies: [],
         topRatedMovies: [],
         upComingMovies: [],
-        actors: []
+        actors: [],
+        actorDetail: [],
+        actorCredits: []
     },
     reducers: {
         addPopularMovies(state, action) {
@@ -163,7 +195,14 @@ const Movies = createSlice({
         addActors(state, action) {
             state.actors = action.payload
             console.log(action.payload)
-        }
+        },
+        addActorDetail(state, action) {
+            state.actorDetail = action.payload
+            console.log(action.payload)
+        },
+        resetActors(state) {
+            state.actors = [];
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -176,11 +215,21 @@ const Movies = createSlice({
             .addCase(fetchUpcoming.fulfilled, (state, action) => {
                 state.upComingMovies = action.payload;
             })
-            .addCase(fetchActors.fulfilled, (state, action) => {
-                state.actors = [...state.actors, ...action.payload]
+            .addCase(fetchActorDetail.fulfilled, (state, action) => {
+                state.actorDetail = action.payload;
             })
+            .addCase(fetchActors.fulfilled, (state, action) => {
+                const newActors = action.payload.filter(
+                    (actor) => !state.actors.some((existingActor) => existingActor.id === actor.id)
+                );
+                state.actors = [...state.actors, ...newActors];
+            })
+            .addCase(fetchActorCredits.fulfilled, (state, action) => {
+                state.actorCredits = action.payload;
+            })
+            
     }
 })
 
-export const { addPopularMovies, addTopRatedMovies, addUpComingMovies } = Movies.actions
+export const { addPopularMovies, addTopRatedMovies, addUpComingMovies, resetActors, addActorDetail } = Movies.actions
 export default Movies.reducer

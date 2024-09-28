@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import styles from './actors.module.scss'
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchActors } from '../../../../store/movies.slice';
+import { fetchActors, resetActors } from '../../../../store/movies.slice';
 import { Link } from 'react-router-dom';
 
 function ActorsPage() {
@@ -26,6 +26,10 @@ function ActorsPage() {
     }, [fetching, currentPage, dispatch]);
 
     useEffect(() => {
+        dispatch(resetActors())
+    }, [])
+
+    useEffect(() => {
         document.addEventListener('scroll', scrollHandler)
 
         return function () {
@@ -46,7 +50,7 @@ function ActorsPage() {
             <div className={styles.actors}>
                 {
                     actors.map((actor) => (
-                        <div className={styles.actor}>
+                        <div className={styles.actor} key={actor.id}>
                             <img src={`https://image.tmdb.org/t/p/original${actor.profile_path}`} alt='фото не найдено' onError={(e) => {
                                 e.target.src = 'https://cdn.icon-icons.com/icons2/1709/PNG/512/user1_112358.png'
                             }} />
