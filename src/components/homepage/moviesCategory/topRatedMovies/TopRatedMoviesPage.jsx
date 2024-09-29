@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchTopRatedMovies } from '../../../../store/movies.slice';
 import { useEffect, useState } from 'react';
 import Header from '../../../header/Header';
+import { Link } from 'react-router-dom';
 
 function TopRatedMoviesPage() {
     const { id } = useParams()
@@ -99,11 +100,12 @@ function TopRatedMoviesPage() {
                         <div className={styles.actorsWrapper}>
                             {
                                 movie.credits.cast.slice(0, 10).map((credit) => (
+
                                     <div className={styles.actor}>
                                         <img src={`https://image.tmdb.org/t/p/original${credit.profile_path}`} alt="Фото не найдено" />
 
                                         <div>
-                                            <p>{credit.name}</p>
+                                            <Link to={`/actors/${credit.id}`}><p>{credit.name}</p></Link>
                                             <p>{credit.character}</p>
                                         </div>
                                     </div>

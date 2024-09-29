@@ -122,14 +122,15 @@
 .leftBlock {
 
     span {
+        display: inline-block;
         font-weight: 700;
         font-size: 24px;
+        margin-top: 25px;
     }
 
     p {
         font-weight: 500;
         font-size: 18px;
-        margin-bottom: 10px;
     }
 }
 
@@ -160,6 +161,16 @@
 
     img {
         width: 100px;
+    }
+
+    a {
+        text-decoration: none;
+        color: #fff;
+    }
+
+    .movietitle {
+        font-weight: 700;
+        font-size: 26px;
     }
 }
 

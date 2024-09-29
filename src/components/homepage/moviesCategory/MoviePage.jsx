@@ -1,26 +1,27 @@
-import { useParams } from "react-router";
-import Header from "../../../header/Header";
-import styles from './popularmovpage.module.scss'
-import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
-import { fetchPopularMovies } from "../../../../store/movies.slice";
-import Trailers from "../trailers/Trailers";
-import TrailerModal from "../trailers/TrailerModal";
+import Header from "../../header/Header";
+import { useParams } from "react-router";
+import styles from './topRatedMovies/topratedmoviespage.module.scss'
 import { Link } from "react-router-dom";
 
-function PopularMovPage() {
+function MoviePage() {
     const { id } = useParams()
-    const dispatch = useDispatch()
-    const { popularMovies } = useSelector((state) => state.movies)
 
-    const movie = popularMovies.find(m => m.id === parseInt(id))
+    const [movie, setMovie] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const [datas, setDatas] = useState({
+        credits: '',
+        videos: '',
+        keywords: ''
+    })
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [crew, setCrew] = useState({
         writer: '',
         producer: '',
-
     })
 
     const handleOpenModal = (trailerKey) => {
@@ -32,36 +33,57 @@ function PopularMovPage() {
     };
 
     useEffect(() => {
-        if (popularMovies.length === 0) {
-            dispatch(fetchPopularMovies())
-        }
-    }, [dispatch, popularMovies.length])
+        const fetchData = async () => {
+            try {
+                const promises = [
+                    fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=32e298a0ed54b91c64093a45759e40aa`),
+                    fetch(`https://api.themoviedb.org/3/movie/${id}/keywords?api_key=32e298a0ed54b91c64093a45759e40aa`), // Example of another request
+                    fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=32e298a0ed54b91c64093a45759e40aa`),
+                    fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=32e298a0ed54b91c64093a45759e40aa`), // Example of another request
+                ];
 
-    useEffect(() => {
-        if (movie) {
-            const writer = movie.credits.crew.find(w => w.job === 'Writer')
-            const producer = movie.credits.crew.find(p => p.job === 'Producer')
+                const responses = await Promise.all(promises);
 
-            setCrew({ writer, producer });
+                // Check if all responses are ok
+                responses.forEach(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                });
 
-            console.log(crew)
-        }
-    }, [movie])
+                // Parse all responses
+                const [movieData, keywordsData, creditsData, videosData] = await Promise.all(responses.map(response => response.json()));
 
-    console.log(movie)
+                setMovie(movieData)
 
-    if (!movie) return <h1>Loading...</h1>
+                setDatas({
+                    ...datas,
+                    credits: creditsData,
+                    videos: videosData,
+                    keywords: keywordsData
+                })
+
+                console.log(movie, datas);
+            } catch (error) {
+                setError(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) return <p>Loading...</p>
 
     return (
         <div className={styles.specificMoviePage}>
             <Header />
             <div className={styles.moviePage}>
-
                 <div className={styles.bgBlock}>
                     <img src={`https://image.tmdb.org/t/p/original/${movie.backdrop_path}`} className={styles.background} />
                     <div className={styles.specificMovie}>
                         <img src={`https://image.tmdb.org/t/p/original/${movie.poster_path}`} />
-
                         <div className={styles.info}>
                             <p className={styles.titleMovie}>{movie.title} </p>
                             <p>{movie.release_date}</p>
@@ -89,24 +111,24 @@ function PopularMovPage() {
                             </div>
 
                             <div className={styles.writers}>
-                                <p>{movie.credits.crew[0].name}</p>
-                                <p>{movie.credits.crew[0].job}</p>
+                                <p>{datas.credits.crew[0].name}</p>
+                                <p>{datas.credits.crew[0].job}</p>
                             </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
             <div className={styles.someDiv}>
-
                 <div className={styles.creditsBlock}>
                     <div className={styles.actors}>
-
                         <p className={styles.title}>Actors</p>
 
                         <div className={styles.actorsWrapper}>
                             {
-                                movie.credits.cast.slice(0, 10).map((credit) => (
+                                datas.credits.cast.slice(0, 10).map((credit) => (
+
                                     <div className={styles.actor}>
                                         <img src={`https://image.tmdb.org/t/p/original${credit.profile_path}`} alt="Фото не найдено" />
 
@@ -124,7 +146,6 @@ function PopularMovPage() {
                                 </span>
                             </div>
                         </div>
-
                     </div>
 
                     <div className={styles.aboutFilm}>
@@ -135,15 +156,15 @@ function PopularMovPage() {
                                 <p className={styles.ttls}>Genre: </p>
 
                                 <div>
-                                    {crew ? movie.littleInfo.genres.map((genre) => (
+                                    {movie.genres.map((genre) => (
                                         <p>{genre.name}</p>
-                                    )) : <p>Loading</p>}
+                                    ))}
                                 </div>
                             </div>
 
                             <div>
                                 <p className={styles.ttls}>Country: </p>
-                                <p>{movie.littleInfo.origin_country[0]}</p>
+                                <p>{movie.origin_country[0]}</p>
                             </div>
 
                             {
@@ -158,7 +179,7 @@ function PopularMovPage() {
                             <div>
                                 <p className={styles.ttls}>Duration: </p>
 
-                                <p>{movie.littleInfo.runtime}m</p>
+                                <p>{movie.runtime}m</p>
                             </div>
 
                             <div>
@@ -166,75 +187,74 @@ function PopularMovPage() {
 
                                 <div>
                                     {
-                                        movie.littleInfo.production_companies.map((p) => (
+                                        movie.production_companies.map((p) => (
                                             <p>{p.name}</p>
                                         ))
                                     }
                                 </div>
                             </div>
 
-
                         </div>
                     </div>
 
-                    <div className={styles.trailerBlock}>
+                    {
+                        datas.videos?.results?.length > 0 && datas.videos.results[0].key  ? (
+                            <div className={styles.trailerBlock}>
+                                <p>Трейлеры фильма</p>
 
-                        <p>Трейлеры фильма</p>
+                                <div className={styles.trailer}>
+                                    <div>
+                                        <img
+                                            src={`https://img.youtube.com/vi/${datas.videos.results[0].key}/hqdefault.jpg`} // Превью с YouTube
+                                            alt="Trailer preview"
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => handleOpenModal(datas.videos.results[0].key)}
 
-                        <div className={styles.trailer}>
-
-                            <div>
-                                <img
-                                    src={`https://img.youtube.com/vi/${movie.trailerKey}/hqdefault.jpg`} // Превью с YouTube
-                                    alt="Trailer preview"
-                                    style={{ cursor: 'pointer' }}
-                                    onClick={() => handleOpenModal(movie.trailerKey)}
-
-                                />
-                                <span className={`material-symbols-outlined ${styles.play}`} onClick={() => handleOpenModal(movie.trailerKey)}>
-                                    play_arrow
-                                </span>
-                            </div>
-
-
-                        </div>
-
-                        {isModalOpen && (
-
-                            <div className={styles.modalOverlay} onClick={handleCloseModal}>
-                                <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                                    <button className={styles.closeBtn} onClick={handleCloseModal}>X</button>
-                                    <iframe
-                                        width="100%"
-                                        height="500px"
-                                        src={`https://www.youtube.com/embed/${movie.trailerKey}`}
-                                        title="Movie Trailer"
-                                        frameBorder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowFullScreen
-                                    ></iframe>
+                                        />
+                                        <span className={`material-symbols-outlined ${styles.play}`} onClick={() => handleOpenModal(datas.videos.results[0].key)}>
+                                            play_arrow
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
 
-                        )}
-                    </div>
+                                {isModalOpen && (
+
+                                    <div className={styles.modalOverlay} onClick={handleCloseModal}>
+                                        <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                                            <button className={styles.closeBtn} onClick={handleCloseModal}>X</button>
+                                            <iframe
+                                                width="100%"
+                                                height="500px"
+                                                src={`https://www.youtube.com/embed/${datas.videos.results[0].key}`}
+                                                title="Movie Trailer"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            ></iframe>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <p>К сожалению, трейлер не доступен для этого фильма.</p>
+                        )
+                    }
 
                 </div>
 
                 <div className={styles.someInfoBlock}>
-
                     <div className={styles.info}>
                         <p>Original language: <br /><span>{movie.original_language === 'en' ? 'English' : ''}</span></p>
 
-                        <p>Status: <br /> <span>{movie.littleInfo.status}</span></p>
+                        <p>Status: <br /> <span>{movie.status}</span></p>
 
-                        <p>Budget: <br /> <span>{movie.littleInfo.budget}$</span></p>
+                        <p>Budget: <br /> <span>{movie.budget}$</span></p>
 
                         <p>Keywords</p>
 
                         <div className={styles.keywords}>
                             {
-                                movie.keywords.keywords.map((keyword) => (
+                                datas.keywords.keywords.map((keyword) => (
                                     <div className={styles.keyword}>{keyword.name}</div>
                                 ))
                             }
@@ -246,4 +266,4 @@ function PopularMovPage() {
     );
 }
 
-export default PopularMovPage;
+export default MoviePage;

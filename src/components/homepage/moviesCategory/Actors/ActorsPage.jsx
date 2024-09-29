@@ -23,6 +23,7 @@ function ActorsPage() {
             setCurrentPage(prevPage => prevPage + 1);
             setFetching(false);
         }
+        console.log(actors)
     }, [fetching, currentPage, dispatch]);
 
     useEffect(() => {
